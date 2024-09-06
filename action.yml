@@ -6,6 +6,18 @@ inputs:
   gh-token:
     description: "Github Token or Pat Token"
     required: true
+  notification-summary:
+    description: "Github Token or Pat Token"
+    required: true
+  msTeams-webhook-uri:
+    description: "Github Token or Pat Token"
+    required: true
+  notification-colour:
+    description: "Github Token or Pat Token"
+    required: true
+  notification-type:
+    description: "Github Token or Pat Token"
+    required: false
 
 runs:
   using: "node16"

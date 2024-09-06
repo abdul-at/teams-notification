@@ -31099,11 +31099,21 @@ exports.run = run;
 const core_1 = __nccwpck_require__(2186);
 const github_1 = __nccwpck_require__(5438);
 async function run() {
-    var _a;
+    var _a, _b;
     const token = (0, core_1.getInput)("gh-token");
+    const notificationSummary = (0, core_1.getInput)("notification-summary");
+    const msTeamsWebhookUri = (0, core_1.getInput)("msTeams-webhook-uri");
+    const notificationColour = (0, core_1.getInput)("notification-colour");
+    const notificationType = (0, core_1.getInput)("notification-type");
     const octoKit = (0, github_1.getOctokit)(token);
     try {
-        let variables = [];
+        let committerName;
+        let commitHtmlUrl;
+        let avatarUrl;
+        let actorUrl;
+        let actorName;
+        let dateTime = new Date();
+        const shortSha = github_1.context.sha.substring(0, 7);
         const repoId = (await octoKit.rest.repos.get({
             owner: github_1.context.repo.owner,
             repo: github_1.context.repo.repo,
@@ -31119,25 +31129,165 @@ async function run() {
                 'X-GitHub-Api-Version': '2022-11-28'
             }
         });
-        console.log(commitDetails.data);
         if (commitDetails.data.author.email != "invalid-email-address") {
-            const committerID = commitDetails.data.author.name;
             const committerName = commitDetails.data.author.name;
             const commitHtmlUrl = commitDetails.data.html_url;
-            const committerUrl = (await octoKit.rest.users.getByUsername({
-                username: commitDetails.data.author.name,
+        }
+        else {
+            const committerName = commitDetails.data.committer.name;
+            const commitHtmlUrl = commitDetails.data.html_url;
+        }
+        if (github_1.context.actor.match("github-actions")) {
+            const appData = (await octoKit.rest.apps.getBySlug({
+                app_slug: "github-actions",
                 headers: {
                     'X-GitHub-Api-Version': '2022-11-28'
                 }
-            })).data.html_url;
-            console.log(committerID);
-            console.log(committerName);
-            console.log(commitHtmlUrl);
-            console.log(committerUrl);
+            })).data;
+            const avatarUrl = (_a = appData.owner) === null || _a === void 0 ? void 0 : _a.avatar_url;
+            const actorUrl = appData.html_url;
+            const actorName = appData.name;
         }
+        else {
+            const userData = (await octoKit.rest.users.getByUsername({
+                username: github_1.context.actor,
+                headers: {
+                    'X-GitHub-Api-Version': '2022-11-28'
+                }
+            })).data;
+            const avatarUrl = userData.avatar_url;
+            const actorUrl = userData.html_url;
+            const actorName = userData.name;
+        }
+        const deployedBy = `[${actorName}](${actorUrl})`;
+        const activitySubtitle = `commited by ${committerName}`;
+        const activityTitle = `CI #${github_1.context.runNumber} (commit ${shortSha}) on [${github_1.context.repo.owner}/${github_1.context.repo.repo}](https://github.com/${github_1.context.repo.owner}/${github_1.context.repo.repo})`;
+        const newbody = {
+            "type": "message",
+            "attachments": [
+                {
+                    "contentType": "application/vnd.microsoft.card.adaptive",
+                    "content": {
+                        "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+                        "type": "AdaptiveCard",
+                        "version": "1.0",
+                        "msteams": {
+                            "width": "Full"
+                        },
+                        "body": [
+                            {
+                                "type": "Container",
+                                "style": notificationColour,
+                                "items": [
+                                    {
+                                        "type": "TextBlock",
+                                        "text": notificationSummary,
+                                        "weight": "bolder",
+                                        "size": "Large"
+                                    },
+                                    {
+                                        "type": "ColumnSet",
+                                        "columns": [
+                                            {
+                                                "type": "Column",
+                                                "width": "auto",
+                                                "items": [
+                                                    {
+                                                        "type": "Image",
+                                                        "url": avatarUrl,
+                                                        "altText": deployedBy,
+                                                        "size": "small",
+                                                        "style": "person"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "type": "Column",
+                                                "width": "stretch",
+                                                "items": [
+                                                    {
+                                                        "type": "TextBlock",
+                                                        "text": deployedBy,
+                                                        "weight": "bolder",
+                                                        "wrap": true
+                                                    },
+                                                    {
+                                                        "type": "TextBlock",
+                                                        "spacing": "none",
+                                                        "text": `Created ${dateTime}`,
+                                                        "isSubtle": true,
+                                                        "wrap": true
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "Container",
+                                "style": "emphasis",
+                                "items": [
+                                    {
+                                        "type": "TextBlock",
+                                        "text": activityTitle,
+                                        "weight": "bolder",
+                                        "wrap": true
+                                    },
+                                    {
+                                        "type": "TextBlock",
+                                        "text": activitySubtitle,
+                                        "wrap": true
+                                    },
+                                    {
+                                        "type": "FactSet",
+                                        "facts": [
+                                            {
+                                                "title": "Deployed by:",
+                                                "value": deployedBy
+                                            },
+                                            {
+                                                "title": "Deployed on:",
+                                                "value": dateTime
+                                            },
+                                            {
+                                                "title": "Branch:",
+                                                "value": github_1.context.ref
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ],
+                        "actions": [
+                            {
+                                "type": "Action.OpenUrl",
+                                "title": "View Workflow Run",
+                                "url": `https://github.com/${github_1.context.repo.owner}/${github_1.context.repo.repo}/actions/runs/${github_1.context.runId}`
+                            },
+                            {
+                                "type": "Action.OpenUrl",
+                                "title": "View Commit Changes",
+                                "url": commitHtmlUrl
+                            }
+                        ]
+                    }
+                }
+            ]
+        };
+        const headers = new Headers();
+        // Add a few headers
+        headers.set('Content-Type', 'application/json');
+        headers.set('Accept', 'application/json');
+        const request = new Request(msTeamsWebhookUri, {
+            method: 'POST',
+            headers: headers,
+            body: JSON.stringify(newbody)
+        });
+        console.log(request);
     }
     catch (error) {
-        (0, core_1.setFailed)((_a = error === null || error === void 0 ? void 0 : error.message) !== null && _a !== void 0 ? _a : "Unknown error");
+        (0, core_1.setFailed)((_b = error === null || error === void 0 ? void 0 : error.message) !== null && _b !== void 0 ? _b : "Unknown error");
     }
 }
 if (!process.env.JEST_WORKER_ID) {

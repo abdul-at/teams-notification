@@ -17,3 +17,6 @@ jobs:
     - uses: ./
       with:
         gh-token: ${{ github.token }}
+        notification-summary: "Deployment test"
+        msTeams-webhook-uri: ${{ secrets.TEAMS_WEBHOOK }}
+        notification-colour: 'good'
