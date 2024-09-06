@@ -1,0 +1,16 @@
+name: "Replace Token"
+description: "Replace Tokens in tokenized files"
+author: "Vinayak Jadhav"
+
+inputs:
+  gh-token:
+    description: "Github Token or Pat Token"
+    required: true
+
+runs:
+  using: "node16"
+  main: "dist/index.js"
+
+branding:
+  icon: "check-square"
+  color: "white"

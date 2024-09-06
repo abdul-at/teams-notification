@@ -1,0 +1,19 @@
+name: Build
+
+on: 
+  workflow_dispatch:
+  push:
+
+
+jobs:
+  Build:
+    runs-on: windows-latest
+    environment: dev
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - uses: ./
+      with:
+        gh-token: ${{ github.token }}

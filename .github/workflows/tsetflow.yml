@@ -1,0 +1,25 @@
+name: Test
+
+on:
+  workflow_dispatch:
+    inputs:
+      logLevel:
+        description: 'Log level'     
+        required: true
+        default: 'warning'
+      tags:
+        description: 'Test scenario tags' 
+
+jobs:
+  Build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: test
+      run: |
+        write-output "${{ inputs.loglevel }}"
+        write-output "${{ inputs.tags }}"
+      shell: pwsh
