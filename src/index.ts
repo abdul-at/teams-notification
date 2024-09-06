@@ -31,7 +31,7 @@ export async function run() {
                     }
         });
 
-        console.log(commitDetails.data.author.email);
+        console.log(commitDetails.data);
         
         if(commitDetails.data.author.email != "invalid-email-address")
         {

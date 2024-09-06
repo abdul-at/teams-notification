@@ -31119,7 +31119,7 @@ async function run() {
                 'X-GitHub-Api-Version': '2022-11-28'
             }
         });
-        console.log(commitDetails.data.author.email);
+        console.log(commitDetails.data);
         if (commitDetails.data.author.email != "invalid-email-address") {
             const committerID = commitDetails.data.author.name;
             const committerName = commitDetails.data.author.name;
