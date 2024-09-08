@@ -76,7 +76,7 @@ export async function run() {
         const activitySubtitle = `commited by ${committerName}`
         const activityTitle = `CI #${context.runNumber} (commit ${shortSha}) on [${context.repo.owner}/${context.repo.repo}](https://github.com/${context.repo.owner}/${context.repo.repo})`
     
-        const newbody = { 
+        const deploymentBody = { 
           "type": "message",
           "attachments": [
           {
@@ -189,6 +189,52 @@ export async function run() {
             }
           ]
         }
+
+        const informationBody = {
+            "type": "message",
+            "attachments": [
+            {
+                "contentType": "application/vnd.microsoft.card.adaptive",
+                "content": {
+                    "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+                    "type": "AdaptiveCard",
+                    "version": "1.0",
+                    "body": [
+                    {
+                        "type": "Container",
+                        "items": [
+                        {
+                            "type": "TextBlock",
+                            "text": "$title",
+                            "weight": "bolder",
+                            "size": "Large",
+                           "color": "$themeColor"
+                        }
+                        ]
+                    }
+                    ],
+                    "actions": [
+                    {
+                        "type": "Action.OpenUrl",
+                        "title": "View Workflow Run",
+                        "url": "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+                    }
+                    ]
+                    }
+                }
+            ]
+        }
+
+        let body;
+        
+        if(notificationType == "deployment")
+        {
+            const body = deploymentBody;
+        }
+        else if(notificationType == "infomation")
+        {
+            const body = informationBody;
+        }
         
         const headers: Headers = new Headers()
         // Add a few headers
@@ -197,7 +243,7 @@ export async function run() {
         const request: RequestInfo = new Request(msTeamsWebhookUri, {
             method: 'POST',
             headers: headers,
-            body: JSON.stringify(newbody)
+            body: JSON.stringify(body)
           })
         
         console.log(request)

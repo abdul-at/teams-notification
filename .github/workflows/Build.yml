@@ -20,3 +20,4 @@ jobs:
         notification-summary: "Deployment test"
         msTeams-webhook-uri: ${{ secrets.TEAMS_WEBHOOK }}
         notification-colour: 'good'
+        notification-type: 'deployment'

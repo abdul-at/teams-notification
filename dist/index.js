@@ -31162,7 +31162,7 @@ async function run() {
         const deployedBy = `[${actorName}](${actorUrl})`;
         const activitySubtitle = `commited by ${committerName}`;
         const activityTitle = `CI #${github_1.context.runNumber} (commit ${shortSha}) on [${github_1.context.repo.owner}/${github_1.context.repo.repo}](https://github.com/${github_1.context.repo.owner}/${github_1.context.repo.repo})`;
-        const newbody = {
+        const deploymentBody = {
             "type": "message",
             "attachments": [
                 {
@@ -31275,6 +31275,47 @@ async function run() {
                 }
             ]
         };
+        const informationBody = {
+            "type": "message",
+            "attachments": [
+                {
+                    "contentType": "application/vnd.microsoft.card.adaptive",
+                    "content": {
+                        "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+                        "type": "AdaptiveCard",
+                        "version": "1.0",
+                        "body": [
+                            {
+                                "type": "Container",
+                                "items": [
+                                    {
+                                        "type": "TextBlock",
+                                        "text": "$title",
+                                        "weight": "bolder",
+                                        "size": "Large",
+                                        "color": "$themeColor"
+                                    }
+                                ]
+                            }
+                        ],
+                        "actions": [
+                            {
+                                "type": "Action.OpenUrl",
+                                "title": "View Workflow Run",
+                                "url": "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+                            }
+                        ]
+                    }
+                }
+            ]
+        };
+        let body;
+        if (notificationType == "deployment") {
+            const body = deploymentBody;
+        }
+        else if (notificationType == "infomation") {
+            const body = informationBody;
+        }
         const headers = new Headers();
         // Add a few headers
         headers.set('Content-Type', 'application/json');
@@ -31282,7 +31323,7 @@ async function run() {
         const request = new Request(msTeamsWebhookUri, {
             method: 'POST',
             headers: headers,
-            body: JSON.stringify(newbody)
+            body: JSON.stringify(body)
         });
         console.log(request);
     }

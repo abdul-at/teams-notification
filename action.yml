@@ -7,20 +7,29 @@ inputs:
     description: "Github Token or Pat Token"
     required: true
   notification-summary:
-    description: "Github Token or Pat Token"
+    description: "notification summary:"
     required: true
   msTeams-webhook-uri:
-    description: "Github Token or Pat Token"
+    description: "msTeams webhook uri"
     required: true
   notification-colour:
-    description: "Github Token or Pat Token"
+    description: "notification colour"
+    type: choice
     required: true
+    options:
+    - good
+    - attention
+    - accent
   notification-type:
     description: "Github Token or Pat Token"
-    required: false
+    required: true
+    type: choice
+    options:
+    - deployment
+    - infomation
 
 runs:
-  using: "node16"
+  using: "node20"
   main: "dist/index.js"
 
 branding:
