@@ -1,4 +1,4 @@
-# Replace token
+# Send Teams notification
 
 Simple GitHub Action to send teams notification to channel using cloudflow template 'Post to a channel when a webhook request is received'  
 
@@ -11,8 +11,8 @@ Please note that variable substitution is case sensitive, please try to store to
 - `gh-token` - Github Token or Pat Token (Required)
 - `notification-summary` - Summary of Notification eg. 'Deployment started on Dev environment v10.2.6' (Required)
 - `msTeams-webhook-uri` - webhook uri of teams channel (Required)
-- `notification-colour` - Notification colour, good for successful, attention for failure, accent for information `#{` (Required)
-- `notification-type` - deployment or information notification (Required)
+- `notification-colour` - Notification colour, `good` for successful, `attention` for failure, `accent` for information `#{` (Required)
+- `notification-type` - `deployment` or `information` notification (Required)
 
 ## Example
 ```yml
