@@ -1,5 +1,5 @@
-name: "Replace Token"
-description: "Replace Tokens in tokenized files"
+name: "Teams Notification"
+description: "Send notification from github workflow to teams channel"
 author: "Vinayak Jadhav"
 
 inputs:
