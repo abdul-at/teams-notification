@@ -1,23 +1,20 @@
 # Replace token
 
-Simple GitHub Action to replace tokens in files. This action can fetch variables stored in Github variables (repository variables, org variables and enviornment variables) and replace them in desired files. 
+Simple GitHub Action to send teams notification to channel using cloudflow template 'Post to a channel when a webhook request is received'  
+
+please follow below link for more details around creation of [incoming webhook for teams channel](https://support.microsoft.com/en-gb/office/create-incoming-webhooks-with-workflows-for-microsoft-teams-8ae491c7-0394-4861-ba59-055e33f75498)
 
 Please note that variable substitution is case sensitive, please try to store tokens in uppercase in Tokenized files.
 
 ## Inputs
 
 - `gh-token` - Github Token or Pat Token (Required)
-- `Environment-Name` - Environment Name, this is required to fetch environment variables from Github Environment (Optional)
-- `Org-Name` - organization Name - This is required to fetch org level variable values (Optional)
-- `tokenprefix` - Token prefix, default is `#{` (Optional)
-- `tokensuffix` - Token suffix, default is `}#` (Optional)
-- `Filespath` - file path of tokenized files (Required)
-- `Filename` - tokenized file name, single file or extenstion eg, .json, .xml (Required)
+- `notification-summary` - Summary of Notification eg. 'Deployment started on Dev environment v10.2.6' (Required)
+- `msTeams-webhook-uri` - webhook uri of teams channel (Required)
+- `notification-colour` - Notification colour, good for successful, attention for failure, accent for information `#{` (Required)
+- `notification-type` - deployment or information notification (Required)
 
 ## Example
-
-If you want to replace `#{APPNAME}#` in tokenized files, add the action to your workflow like this:
-
 ```yml
 
 jobs:
@@ -28,49 +25,11 @@ jobs:
     - name: 'Checkout Github Action' 
       uses: actions/checkout@4
 
-    - uses: vinayaja/replace-token@v1.0.0
+    - uses: vinayaja/teams-notification@v1.0.0
       with:
-        gh-token: ${{ secrets.PAT_TOKEN }} 
-        Environment-Name: 'dev'  
-        Filespath: ${{ github.workspace}}/files 
-        FileName: '.json'
+        gh-token: ${{ github.token }}
+        notification-summary: "Deployment test"
+        msTeams-webhook-uri: ${{ secrets.TEAMS_WEBHOOK }}
+        notification-colour: 'good'
+        notification-type: 'deployment'
 ```
-If you want to use a different token format, you can specify a custom token prefix/suffix. For example, to replace just tokens like `{APPLICATION}` you could add:
-
-```yml
-
-- uses: vinayaja/replace-token@v1.0.0
-  with:
-    gh-token: ${{ secrets.PAT_TOKEN }} 
-    Environment-Name: 'dev'  
-    Filespath: ${{ github.workspace}}/files 
-    FileName: '.json'
-    tokenprefix: '{'
-    tokensuffix: '}'
-```
-
-### Example of tokenized json file
-
-```json
-
-{
-    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
-    "contentVersion": "1.0.0.0",
-    "parameters": {
-        "paramAPPServiceName": {
-            "value": "#{APPSERVICENAME}#"
-        },
-        "paramAPIName": {
-            "value": "#{APINAME}#"
-        },
-        "paramStorageAccountName": {
-            "value": "#{STORAGEACCOUNTNAME}#"
-        }
-    }
-}
-
-```
-
-### Example of variables store in github
-
-![alt text](image.png)
