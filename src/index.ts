@@ -75,64 +75,32 @@ export async function run() {
         const activityTitle = `CI #${context.runNumber} (commit ${shortSha}) on [${context.repo.owner}/${context.repo.repo}](https://github.com/${context.repo.owner}/${context.repo.repo})`;
 
         const deploymentBody = {
-            "title": "GitHub Actions Notification",
-            "text": notificationSummary,
-            "attachments": [
-                {
-                    "contentType": "application/vnd.microsoft.card.adaptive",
-                    "content": {
-                        "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
-                        "type": "AdaptiveCard",
-                        "version": "1.2",
-                        "body": [
-                            {
-                                "type": "TextBlock",
-                                "text": notificationSummary,
-                                "weight": "Bolder",
-                                "size": "Large"
-                            },
-                            {
-                                "type": "ColumnSet",
-                                "columns": [
-                                    {
-                                        "type": "Column",
-                                        "width": "auto",
-                                        "items": [
-                                            {
-                                                "type": "Image",
-                                                "url": avatarUrl,
-                                                "altText": deployedBy,
-                                                "size": "Small",
-                                                "style": "Person"
-                                            }
-                                        ]
-                                    },
-                                    {
-                                        "type": "Column",
-                                        "width": "stretch",
-                                        "items": [
-                                            {
-                                                "type": "TextBlock",
-                                                "text": deployedBy,
-                                                "weight": "Bolder",
-                                                "wrap": true
-                                            },
-                                            {
-                                                "type": "TextBlock",
-                                                "spacing": "None",
-                                                "text": `Created ${dateTime}`,
-                                                "isSubtle": true,
-                                                "wrap": true
-                                            }
-                                        ]
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                }
-            ]
-        };
+         "title": "GitHub Actions Notification",
+         "text": "A new push to the **main** branch has been made.",
+         "attachments": [
+          {
+           "contentType": "application/vnd.microsoft.card.adaptive",
+           "content": {
+           "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+           "type": "AdaptiveCard",
+           "version": "1.2",
+           "body": [
+           {
+            "type": "TextBlock",
+            "text": "GitHub Actions Notification",
+            "weight": "Bolder",
+            "size": "Medium"
+          },
+          {
+            "type": "TextBlock",
+            "text": "A new push to the **main** branch has been made.",
+            "wrap": true
+           }
+         ]
+         }
+         }
+         ]
+};
 
         let body;
         if (notificationType === "deployment") {
